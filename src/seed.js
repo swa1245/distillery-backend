@@ -4,29 +4,40 @@ import { User } from "./models/User.js";
 
 const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/distiller";
 
-/** DistilPro admin login only — no sample plant data. */
-const DEFAULT_USER = {
-  email: "admin@distilpro.com",
-  password: "admin123",
-  username: "admin",
-  role: "admin",
-  organizationName: "BioFuelPro Distillery",
-};
+/** DistilPro logins only — no sample plant data. */
+const USERS = [
+  {
+    email: "admin@distilpro.com",
+    password: "admin123",
+    username: "admin",
+    role: "admin",
+    organizationName: "BioFuelPro Distillery",
+  },
+  {
+    email: "user@distilpro.com",
+    password: "user123",
+    username: "user",
+    role: "user",
+    organizationName: "BioFuelPro Distillery",
+  },
+];
 
 async function main() {
   await connectDb(uri);
 
-  // Remove old demo emails so only DistilPro admin remains
-  await User.deleteMany({
-    email: { $in: ["admin@biofuelpro.com", "admin@distilpro.com"] },
-  });
+  // Drop old BioFuelPro demo login if present
+  await User.deleteMany({ email: "admin@biofuelpro.com" });
 
-  await User.create(DEFAULT_USER);
+  for (const u of USERS) {
+    await User.findOneAndUpdate(
+      { email: u.email },
+      { $set: u },
+      { upsert: true, new: true }
+    );
+    console.log(`  ✓ ${u.email} / ${u.password}  (${u.role})`);
+  }
 
-  console.log(`Seeded login only (no plant data)`);
-  console.log(`  email:    ${DEFAULT_USER.email}`);
-  console.log(`  password: ${DEFAULT_USER.password}`);
-  console.log(`  org:      ${DEFAULT_USER.organizationName}`);
+  console.log("\nSeeded DistilPro login users only (no plant data).");
   process.exit(0);
 }
 
