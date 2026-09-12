@@ -87,6 +87,7 @@ Row fields: `id`, `section` (A–G), `slNo`, `particulars`, `unit`, `target`, `a
 | POST | `/api/auth/login` | `{ email, password }` → user + token |
 | GET | `/api/auth/default` | Demo credentials hint |
 
-Default seeded login: `admin@distilpro.com` / `admin123`
+Default seeded login: `admin@distilpro.com` / `admin123` (user only — no sample data)
+
 
 Health: `GET /health`
