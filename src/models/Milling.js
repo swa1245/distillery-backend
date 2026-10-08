@@ -19,6 +19,7 @@ const millingSchema = new mongoose.Schema(
     finePowder: { type: String, default: "" },
     starch: { type: String, default: "" },
     passFermenter: { type: String, default: "" },
+    batchId: { type: String, default: "" },
     remarks: { type: String, default: "" },
   },
   { timestamps: true, strict: false }

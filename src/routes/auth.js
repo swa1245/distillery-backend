@@ -41,26 +41,4 @@ router.post("/login", async (req, res) => {
   }
 });
 
-/** GET /api/auth/default — demo hint (safe to expose in demo) */
-router.get("/default", async (_req, res) => {
-  try {
-    const doc = await User.findOne().sort({ createdAt: 1 }).lean();
-    if (!doc) {
-      return res.json({
-        success: true,
-        email: "admin@distilpro.com",
-        password: "admin123",
-      });
-    }
-    res.json({
-      success: true,
-      email: doc.email,
-      password: doc.password,
-      username: doc.username,
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
 export default router;

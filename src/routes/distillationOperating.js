@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { DistillationOperating } from "../models/DistillationOperating.js";
+import { distillationEvents, recordPlantEvents } from "../services/plantEvents.js";
 
 const router = Router();
 
@@ -64,11 +65,13 @@ router.put("/:date", async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid date" });
     }
     const payload = normalizePayload(req.body || {}, date);
+    const before = await DistillationOperating.findOne({ date }).lean();
     const row = await DistillationOperating.findOneAndUpdate(
       { date },
       { $set: payload },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     ).lean();
+    await recordPlantEvents(distillationEvents(before, row));
     res.json({ success: true, row });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -83,11 +86,13 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ success: false, message: "date (YYYY-MM-DD) required" });
     }
     const payload = normalizePayload(req.body || {}, date);
+    const before = await DistillationOperating.findOne({ date }).lean();
     const row = await DistillationOperating.findOneAndUpdate(
       { date },
       { $set: payload },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     ).lean();
+    await recordPlantEvents(distillationEvents(before, row));
     res.status(201).json({ success: true, row });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
