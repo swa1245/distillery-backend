@@ -10,9 +10,13 @@ const fermenterSchema = new mongoose.Schema(
     },
     date: { type: String, default: "" },
     time: { type: String, default: "" },
+    batchId: { type: String, default: "" },
     fermenterNo: { type: String, default: "" },
     status: { type: String, default: "" },
     volPct: { type: String, default: "" },
+    levelPct: { type: String, default: "" },
+    volume: { type: String, default: "" },
+    va: { type: String, default: "" },
     gravity: { type: String, default: "" },
     rsPct: { type: String, default: "" },
     dstPct: { type: String, default: "" },
@@ -44,5 +48,6 @@ const fermenterSchema = new mongoose.Schema(
 );
 
 fermenterSchema.index({ date: 1, view: 1 });
+fermenterSchema.index({ batchId: 1, view: 1 });
 
 export const Fermenter = mongoose.model("Fermenter", fermenterSchema);

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { Inward } from "../models/Inward.js";
+import { inwardEvents, recordPlantEvents } from "../services/plantEvents.js";
 
 const router = Router();
 
@@ -56,6 +57,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const row = await Inward.create(withDerived(req.body || {}));
+    await recordPlantEvents(inwardEvents(null, row.toObject()));
     res.status(201).json({ success: true, row });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -65,12 +67,14 @@ router.post("/", async (req, res) => {
 /** PUT /api/inward/:id */
 router.put("/:id", async (req, res) => {
   try {
+    const before = await Inward.findById(req.params.id).lean();
     const row = await Inward.findByIdAndUpdate(
       req.params.id,
       withDerived(req.body || {}),
       { new: true, runValidators: true }
     ).lean();
     if (!row) return res.status(404).json({ success: false, message: "Not found" });
+    await recordPlantEvents(inwardEvents(before, row));
     res.json({ success: true, row });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });

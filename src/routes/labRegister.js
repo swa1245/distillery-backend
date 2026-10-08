@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { LabSampleRegister } from "../models/LabSampleRegister.js";
+import { labRegisterEvents, recordPlantEvents } from "../services/plantEvents.js";
 
 const router = Router();
 
@@ -61,11 +62,13 @@ router.put("/:date", async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid date" });
     }
     const payload = normalizePayload(req.body || {}, date);
+    const before = await LabSampleRegister.findOne({ date }).lean();
     const row = await LabSampleRegister.findOneAndUpdate(
       { date },
       { $set: payload },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     ).lean();
+    await recordPlantEvents(labRegisterEvents(before, row));
     res.json({ success: true, row });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -80,11 +83,13 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ success: false, message: "date (YYYY-MM-DD) required" });
     }
     const payload = normalizePayload(req.body || {}, date);
+    const before = await LabSampleRegister.findOne({ date }).lean();
     const row = await LabSampleRegister.findOneAndUpdate(
       { date },
       { $set: payload },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     ).lean();
+    await recordPlantEvents(labRegisterEvents(before, row));
     res.status(201).json({ success: true, row });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });

@@ -36,6 +36,7 @@ const liquefactionSchema = new mongoose.Schema(
     lt2Rs: { type: String, default: "" },
     lt2Iodine: { type: String, default: "" },
     passFermenter: { type: String, default: "" },
+    batchId: { type: String, default: "" },
     dp4Pct: { type: String, default: "" },
     dp3Pct: { type: String, default: "" },
     dp2Pct: { type: String, default: "" },

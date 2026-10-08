@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { Outward } from "../models/Outward.js";
+import { outwardEvents, recordPlantEvents } from "../services/plantEvents.js";
 
 const router = Router();
 
@@ -60,6 +61,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const row = await Outward.create(withDerived(req.body || {}));
+    await recordPlantEvents(outwardEvents(null, row.toObject()));
     res.status(201).json({ success: true, row });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -69,12 +71,14 @@ router.post("/", async (req, res) => {
 /** PUT /api/outward/:id */
 router.put("/:id", async (req, res) => {
   try {
+    const before = await Outward.findById(req.params.id).lean();
     const row = await Outward.findByIdAndUpdate(
       req.params.id,
       withDerived(req.body || {}),
       { new: true, runValidators: true }
     ).lean();
     if (!row) return res.status(404).json({ success: false, message: "Not found" });
+    await recordPlantEvents(outwardEvents(before, row));
     res.json({ success: true, row });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });

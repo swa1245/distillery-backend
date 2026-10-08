@@ -14,6 +14,7 @@ const prefermenterSchema = new mongoose.Schema(
     timeH: { type: String, default: "" },
     pfNumber: { type: String, default: "" },
     passFermenter: { type: String, default: "" },
+    batchId: { type: String, default: "" },
     spGr: { type: String, default: "" },
     temp: { type: String, default: "" },
     ph: { type: String, default: "" },
@@ -23,6 +24,8 @@ const prefermenterSchema = new mongoose.Schema(
     antiBiotic: { type: String, default: "" },
     booster: { type: String, default: "" },
     cellCount: { type: String, default: "" },
+    liveBuddingCell: { type: String, default: "" },
+    liveSingleCells: { type: String, default: "" },
     levelPct: { type: String, default: "" },
     rsPct: { type: String, default: "" },
     alcPct: { type: String, default: "" },
@@ -51,5 +54,6 @@ const prefermenterSchema = new mongoose.Schema(
 );
 
 prefermenterSchema.index({ date: 1, view: 1 });
+prefermenterSchema.index({ batchId: 1, view: 1 });
 
 export const Prefermenter = mongoose.model("Prefermenter", prefermenterSchema);
